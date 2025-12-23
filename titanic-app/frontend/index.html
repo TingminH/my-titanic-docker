@@ -1,61 +1,506 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>鐵達尼號數據中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMS TITANIC - Passenger Manifest</title>
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 40px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #1a73e8; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #1a73e8; color: white; }
-        tr:hover { background-color: #f5f5f5; }
-        .status-alive { color: green; font-weight: bold; }
-        .status-dead { color: red; }
+        :root {
+            --primary-dark: #0f172a;
+            /* 深夜藍 */
+            --accent-gold: #c4a059;
+            /* 經典奢華金 */
+            --highlight-bg: #fff176;
+            /* 搜尋高亮底色 */
+            --bg-tint: #fcfbf9;
+            /* 網頁背景 */
+            --text-grey: #64748b;
+            --white: #ffffff;
+            --border-light: #e2e8f0;
+            --th-bg: #daccae;
+            /* 表格標題背景色 */
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background-color: var(--bg-tint);
+            color: var(--primary-dark);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- 1. Landing Page --- */
+        #landing-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            /* 請確保圖片已在 frontend 資料夾 */
+            background-image: url('Gemini_Generated_Image_uigqxguigqxguigq.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 1s ease-out;
+        }
+
+        #landing-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(0, 0, 0, 0.9));
+            z-index: 1;
+        }
+
+        .landing-content {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+            padding: 20px;
+        }
+
+        .landing-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+        }
+
+        .landing-subtitle {
+            font-family: 'Lora', serif;
+            font-size: 1.2rem;
+            color: var(--white);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+
+        .enter-btn {
+            padding: 15px 40px;
+            border: 1px solid var(--accent-gold);
+            background: transparent;
+            color: var(--accent-gold);
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .enter-btn:hover {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+            box-shadow: 0 0 20px rgba(196, 160, 89, 0.4);
+        }
+
+        /* --- 2. Main App --- */
+        #main-app {
+            opacity: 0;
+            transition: opacity 1s ease-in;
+            display: none;
+            padding: 60px 20px;
+            justify-content: center;
+            display: flex;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--white);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        .header {
+            padding: 50px 40px;
+            text-align: center;
+            background-color: var(--white);
+            border-bottom: 4px solid var(--primary-dark);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            margin: 0;
+            color: var(--primary-dark);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: var(--accent-gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 500;
+            opacity: 0.95;
+        }
+
+        /* --- 搜尋與篩選區域 --- */
+        .search-bar {
+            padding: 30px 40px 10px 40px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            /* 讓下拉選單跟輸入框對齊 */
+            background: white;
+            gap: 20px;
+            /* 兩個輸入框之間的間距 */
+        }
+
+        /* [新增] 下拉選單樣式 */
+        .search-select {
+            padding: 10px 0;
+            width: 150px;
+            border: none;
+            border-bottom: 1px solid #cbd5e1;
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            outline: none;
+            color: var(--primary-dark);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-select:focus {
+            border-bottom: 1px solid var(--accent-gold);
+        }
+
+        .search-input {
+            padding: 10px 0;
+            width: 250px;
+            border: none;
+            border-bottom: 1px solid #cbd5e1;
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            outline: none;
+            color: var(--primary-dark);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-bottom: 1px solid var(--accent-gold);
+            width: 300px;
+        }
+
+        /* 表格樣式 */
+        .table-container {
+            padding: 10px 40px 20px 40px;
+            overflow-x: auto;
+            min-height: 400px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            text-align: left;
+            padding: 18px 20px;
+            background-color: var(--white);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 1.05rem;
+            color: #334155;
+        }
+
+        td.name-col {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* 搜尋高亮 */
+        .highlight-text {
+            background-color: var(--highlight-bg);
+            color: #000;
+            font-weight: bold;
+            padding: 0 2px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        tbody tr:hover {
+            background-color: #fffdf5;
+        }
+
+        /* 分頁器 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 40px 50px 40px;
+            gap: 20px;
+        }
+
+        .page-btn {
+            border: 1px solid var(--border-light);
+            background: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            color: var(--text-grey);
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-family: 'Lora', serif;
+            font-size: 0.9rem;
+            color: var(--text-grey);
+            font-style: italic;
+        }
+
+        /* 狀態樣式 */
+        .pclass {
+            font-style: italic;
+            color: #64748b;
+        }
+
+        .status {
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .status-survived {
+            color: #059669;
+        }
+
+        .status-deceased {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>🚢 鐵達尼號乘客數據查詢系統</h1>
-        <table id="data-table">
-            <thead>
-                <tr>
-                    <th>姓名</th>
-                    <th>性別</th>
-                    <th>年齡</th>
-                    <th>艙等</th>
-                    <th>生存狀態</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+
+    <div id="landing-page">
+        <div id="landing-overlay"></div>
+        <div class="landing-content">
+            <h1 class="landing-title">RMS Titanic</h1>
+            <div class="landing-subtitle">Passenger Manifest Data</div>
+            <button class="enter-btn" onclick="enterSite()">Access Archives</button>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <div class="container">
+            <div class="header">
+                <h1>RMS Titanic</h1>
+                <div class="subtitle">Passenger Manifest Data</div>
+            </div>
+
+            <div class="search-bar">
+                <select id="gender-select" class="search-select">
+                    <option value="">All Genders</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+
+                <input type="text" id="search-input" class="search-input" placeholder="Search passenger name...">
+            </div>
+
+            <div class="table-container">
+                <table id="passenger-table">
+                    <thead>
+                        <tr>
+                            <th width="30%">Passenger Name</th>
+                            <th width="15%">Gender</th>
+                            <th width="15%">Age</th>
+                            <th width="20%">Class</th>
+                            <th width="20%">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <p id="no-result"
+                    style="display:none; text-align:center; color:#999; margin-top:30px; font-style:italic;">
+                    No records found.
+                </p>
+            </div>
+
+            <div class="pagination" id="pagination-controls">
+                <button class="page-btn" id="prev-btn" onclick="changePage(-1)">Previous</button>
+                <span class="page-info" id="page-info">Page 1</span>
+                <button class="page-btn" id="next-btn" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 取得當前網址的 IP，自動連結到後端 5000 port
-        const vmIP = window.location.hostname; 
-        
-        fetch(`http://${vmIP}:5000/api/passengers`)
+        const vmIP = window.location.hostname;
+        const API_URL = `http://${vmIP}:5001/api/passengers`;
+
+        let allData = [];
+        let currentData = [];
+        let currentPage = 1;
+        const rowsPerPage = 20;
+
+        function enterSite() {
+            const landing = document.getElementById('landing-page');
+            const mainApp = document.getElementById('main-app');
+            landing.style.opacity = '0';
+            setTimeout(() => {
+                landing.style.display = 'none';
+                mainApp.style.display = 'flex';
+                setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
+            }, 800);
+        }
+
+        fetch(API_URL)
             .then(response => response.json())
             .then(data => {
-                const tbody = document.querySelector('#data-table tbody');
-                data.forEach(p => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${p.pname}</td>
-                        <td>${p.sex}</td>
-                        <td>${p.age || '未知'}</td>
-                        <td>${p.pclass}</td>
-                        <td class="${p.survived == 1 ? 'status-alive' : 'status-dead'}">
-                            ${p.survived == 1 ? '✅ 生還' : '❌ 罹難'}
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
+                allData = data;
+                // 初始載入時執行一次篩選(預設全選)
+                applyFilters();
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                document.querySelector('.table-container').innerHTML =
+                    `<p style="text-align:center; color:#991b1b; margin-top:30px;">System Offline.</p>`;
+            });
+
+        function renderTable() {
+            const tbody = document.querySelector('#passenger-table tbody');
+            const noResultMsg = document.getElementById('no-result');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const pageInfo = document.getElementById('page-info');
+
+            const searchTerm = document.getElementById('search-input').value.trim();
+
+            tbody.innerHTML = '';
+
+            if (currentData.length === 0) {
+                noResultMsg.style.display = 'block';
+                document.getElementById('pagination-controls').style.display = 'none';
+                return;
+            } else {
+                noResultMsg.style.display = 'none';
+                document.getElementById('pagination-controls').style.display = 'flex';
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = currentData.slice(startIndex, endIndex);
+
+            pageData.forEach(p => {
+                const row = document.createElement('tr');
+
+                let classText = 'Unknown';
+                if (p.pclass == 1) classText = 'First Class';
+                if (p.pclass == 2) classText = 'Second Class';
+                if (p.pclass == 3) classText = 'Third Class';
+
+                const statusClass = p.survived == 1 ? 'status-survived' : 'status-deceased';
+                const statusText = p.survived == 1 ? 'Survived' : 'Deceased';
+
+                // 高亮邏輯
+                let displayName = p.pname;
+                if (searchTerm !== "") {
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    displayName = p.pname.replace(regex, '<span class="highlight-text">$1</span>');
+                }
+
+                row.innerHTML = `
+                    <td class="name-col">${displayName}</td>
+                    <td>${p.sex === 'male' ? 'Male' : 'Female'}</td>
+                    <td>${p.age ? p.age : '—'}</td>
+                    <td class="pclass">${classText}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            const totalPages = Math.ceil(currentData.length / rowsPerPage);
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderTable();
+            document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- 核心篩選功能 (整合搜尋與性別) ---
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const selectedGender = document.getElementById('gender-select').value;
+
+            currentData = allData.filter(passenger => {
+                // 1. 檢查名字 (包含搜尋字串)
+                const nameMatch = passenger.pname.toLowerCase().includes(searchTerm);
+
+                // 2. 檢查性別 (如果選 All 則是 true，否則要相符)
+                const genderMatch = selectedGender === "" || passenger.sex === selectedGender;
+
+                // 兩個條件都要符合
+                return nameMatch && genderMatch;
+            });
+
+            // 每次篩選後重置回第一頁
+            currentPage = 1;
+            renderTable();
+        }
+
+        // 綁定事件：不管是輸入文字還是選擇下拉選單，都呼叫 applyFilters
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+        document.getElementById('gender-select').addEventListener('change', applyFilters);
+
     </script>
 </body>
+
 </html>
