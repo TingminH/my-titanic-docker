@@ -9,28 +9,28 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./database/titanic_full_data.csv:/var/lib/mysql-files/titanic_full_data.csv
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
   backend:
-    build: ./backend        # 告訴 Docker 去 backend 資料夾找 Dockerfile 來編譯
+    build: ./backend # 告訴 Docker 去 backend 資料夾找 Dockerfile 來編譯
     container_name: flask_backend
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
     ports:
-      - "5000:5000"         # 將虛擬機的 5000 對應到容器的 5000
+      - "5001:5000" # 將虛擬機的 5000 對應到容器的 5000
     depends_on:
-      - db                  # 確保資料庫先啟動，後端才啟動
+      - db # 確保資料庫先啟動，後端才啟動
     restart: always
 
   frontend:
-    image: nginx:alpine     # 使用極小化的 Nginx 映像檔
+    image: nginx:alpine # 使用極小化的 Nginx 映像檔
     container_name: web_frontend
     volumes:
       # 把我們寫的網頁掛載到 Nginx 預設讀取的目錄
       - ./frontend:/usr/share/nginx/html
     ports:
-      - "80:80"             # 將 VM 的 80 port (標準網頁埠) 對應出去
+      - "80:80" # 將 VM 的 80 port (標準網頁埠) 對應出去
     depends_on:
-      - backend             # 確保後端先啟動
+      - backend # 確保後端先啟動
     restart: always
