@@ -20,7 +20,7 @@ def get_passengers():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True) # 以字典格式回傳，方便轉成 JSON
-        cursor.execute("SELECT * FROM full_passengers LIMIT 20")
+        cursor.execute("SELECT * FROM full_passengers")
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
